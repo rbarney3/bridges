@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bridges for Kids</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #4682b4;
+      color: white;
+      padding: 20px;
+      font-size: 2em;
+    }
+    .section {
+      padding: 20px;
+    }
+    .card {
+      display: inline-block;
+      width: 220px;
+      margin: 10px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .fact {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    .drag-zone {
+      border: 2px dashed #4682b4;
+      min-height: 150px;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 10px;
+    }
+    .draggable {
+      display: inline-block;
+      padding: 10px;
+      background: #ffe4b5;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: grab;
+    }
+    #resetBtn {
+      margin: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #4682b4;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #resetBtn:hover {
+      background-color: #315f7f;
+    }
+  </style>
+</head>
+<body>
+  <header>All About Bridges!</header>
+
+  <div class="section">
+    <h2>What Makes a Strong Bridge?</h2>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Triangles</h3>
+      <div class="fact">Triangles are very strong shapes. They help spread out the weight so bridges don’t fall down!</div>
+    </div>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Materials</h3>
+      <div class="fact">Bridges are built with strong materials like steel, stone, and concrete.</div>
+    </div>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Support</h3>
+      <div class="fact">Bridges need supports or towers to hold up the road or walkway.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Types of Bridges</h2>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Beam Bridge</h3>
+      <img src="beambridge.jpg" alt="Beam Bridge">
+      <div class="fact">Beam bridges are simple, flat bridges. They work well for short distances.</div>
+    </div>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Arch Bridge</h3>
+      <img src="archbridge.jpg" alt="Arch Bridge">
+      <div class="fact">Arch bridges are curved. The shape helps spread out the weight and makes them strong.</div>
+    </div>
+    <div class="card" onclick="toggleFact(this)">
+      <h3>Suspension Bridge</h3>
+      <img src="suspensionbridge.jpg" alt="Suspension Bridge">
+      <div class="fact">Suspension bridges hang from tall towers with cables. They can stretch across very long distances!</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Bridge Match Game!</h2>
+    <p>Drag the type of bridge into the correct zone:</p>
+    <div id="draggables">
+      <div class="draggable" draggable="true" id="beam">Beam Bridge</div>
+      <div class="draggable" draggable="true" id="arch">Arch Bridge</div>
+      <div class="draggable" draggable="true" id="suspension">Suspension Bridge</div>
+    </div>
+
+    <div class="drag-zone" id="beam-zone">Drop here if it’s flat and simple</div>
+    <div class="drag-zone" id="arch-zone">Drop here if it’s curved</div>
+    <div class="drag-zone" id="suspension-zone">Drop here if it hangs on cables</div>
+  </div>
+
+  <button id="resetBtn" onclick="resetGame()">Reset Game</button>
+
+  <script>
+    function toggleFact(card) {
+      let fact = card.querySelector('.fact');
+      fact.style.display = fact.style.display === 'block' ? 'none' : 'block';
+    }
+
+    const zones = document.querySelectorAll('.drag-zone');
+
+    function makeDraggablesActive() {
+      const draggables = document.querySelectorAll('.draggable');
+      draggables.forEach(item => {
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', e.target.id);
+        });
+      });
+    }
+
+    makeDraggablesActive();
+
+    zones.forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text');
+        const dragged = document.getElementById(id);
+        if ((zone.id === 'beam-zone' && id === 'beam') ||
+            (zone.id === 'arch-zone' && id === 'arch') ||
+            (zone.id === 'suspension-zone' && id === 'suspension')) {
+          zone.style.background = '#90ee90';
+          zone.innerText = "Great job! That's correct!";
+          dragged.remove();
+        } else {
+          zone.style.background = '#ffcccb';
+          zone.innerText = "Oops! Try again.";
+        }
+      });
+    });
+
+    function resetGame() {
+      // Reset zones
+      zones.forEach(zone => {
+        zone.style.background = '';
+        if (zone.id === 'beam-zone') zone.innerText = "Drop here if it’s flat and simple";
+        if (zone.id === 'arch-zone') zone.innerText = "Drop here if it’s curved";
+        if (zone.id === 'suspension-zone') zone.innerText = "Drop here if it hangs on cables";
+      });
+      
+      // Reset draggables
+      const draggablesContainer = document.getElementById('draggables');
+      draggablesContainer.innerHTML = `
+        <div class="draggable" draggable="true" id="beam">Beam Bridge</div>
+        <div class="draggable" draggable="true" id="arch">Arch Bridge</div>
+        <div class="draggable" draggable="true" id="suspension">Suspension Bridge</div>
+      `;
+      makeDraggablesActive();
+    }
+  </script>
+</body>
+</html>
