@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All About Bridges</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .card {
+      display: inline-block;
+      width: 220px;
+      margin: 10px;
+      padding: 15px;
+      border: 2px solid #2c3e50;
+      border-radius: 10px;
+      background-color: #ffffff;
+      cursor: pointer;
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .hidden {
+      display: none;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .draggables {
+      margin: 20px;
+    }
+    .draggable {
+      display: inline-block;
+      padding: 10px 15px;
+      margin: 5px;
+      background-color: #3498db;
+      color: white;
+      border-radius: 8px;
+      cursor: grab;
+    }
+    .dropzone {
+      display: inline-block;
+      width: 180px;
+      height: 70px;
+      margin: 10px;
+      border: 2px dashed #7f8c8d;
+      border-radius: 10px;
+      vertical-align: top;
+      padding: 5px;
+      font-size: 14px;
+      background-color: #ecf0f1;
+    }
+    #reset {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bridges: Strong Structures!</h1>
+  <p>Click on a type of bridge to learn what makes it strong and why engineers build it.</p>
+
+  <div class="card" onclick="toggleInfo('beam')">
+    <h3>Beam Bridge</h3>
+    <img src="beambridge.jpg" alt="Beam Bridge">
+    <div id="beam" class="hidden">
+      <p><strong>What is it?</strong> A simple bridge with a flat beam across supports.</p>
+      <p><strong>Why use it?</strong> Beam bridges are great for short spans like highways and small rivers because they are simple and cost-effective to build.</p>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggleInfo('arch')">
+    <h3>Arch Bridge</h3>
+    <img src="archbridge.jpg" alt="Arch Bridge">
+    <div id="arch" class="hidden">
+      <p><strong>What is it?</strong> A bridge with a curved arch that carries weight outward.</p>
+      <p><strong>Why use it?</strong> Arch bridges are strong and durable, often used to cross valleys or rivers. Their shape helps spread out the weight.</p>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggleInfo('suspension')">
+    <h3>Suspension Bridge</h3>
+    <img src="suspensionbridge.jpg" alt="Suspension Bridge">
+    <div id="suspension" class="hidden">
+      <p><strong>What is it?</strong> A bridge with the deck hanging from cables held by tall towers.</p>
+      <p><strong>Why use it?</strong> Suspension bridges can span very long distances, like wide bays or large rivers, and are flexible enough to handle wind and traffic.</p>
+    </div>
+  </div>
+
+  <h2>Bridge Matching Game</h2>
+  <p>Drag or tap the bridge names to match them to the correct description!</p>
+
+  <div class="draggables" id="draggables">
+    <div class="draggable" draggable="true">Beam Bridge</div>
+    <div class="draggable" draggable="true">Arch Bridge</div>
+    <div class="draggable" draggable="true">Suspension Bridge</div>
+  </div>
+
+  <div id="dropzones">
+    <div class="dropzone" data-answer="Beam Bridge">Flat beam across supports</div>
+    <div class="dropzone" data-answer="Arch Bridge">Curved arch helps spread weight</div>
+    <div class="dropzone" data-answer="Suspension Bridge">Deck hangs from cables on tall towers</div>
+  </div>
+
+  <button id="reset" onclick="resetGame()">Reset Game</button>
+
+  <script>
+    function toggleInfo(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+    }
+
+    const draggables = document.querySelectorAll('.draggable');
+    const dropzones = document.querySelectorAll('.dropzone');
+    let selected = null;
+
+    draggables.forEach(d => {
+      d.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', d.textContent);
+      });
+      d.addEventListener('click', () => {
+        selected = d;
+        draggables.forEach(x => x.style.border = '');
+        d.style.border = '2px solid red';
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        checkAnswer(zone, data);
+      });
+      zone.addEventListener('click', () => {
+        if (selected) {
+          checkAnswer(zone, selected.textContent);
+          selected.style.border = '';
+          selected = null;
+        }
+      });
+    });
+
+    function checkAnswer(zone, text) {
+      if (zone.dataset.answer === text) {
+        zone.textContent = text + " ✅";
+        zone.style.backgroundColor = '#2ecc71';
+      } else {
+        zone.textContent = "Try again ❌";
+        zone.style.backgroundColor = '#e74c3c';
+        setTimeout(() => {
+          zone.textContent = zone.dataset.answerDescription;
+          zone.style.backgroundColor = '#ecf0f1';
+        }, 1000);
+      }
+    }
+
+    function resetGame() {
+      // Reset draggable order
+      const container = document.getElementById('draggables');
+      const items = Array.from(container.children);
+      items.sort(() => Math.random() - 0.5);
+      items.forEach(i => container.appendChild(i));
+
+      // Reset dropzones and shuffle
+      const dropContainer = document.getElementById('dropzones');
+      const zones = Array.from(dropContainer.children);
+      zones.forEach(zone => {
+        zone.style.backgroundColor = '#ecf0f1';
+        if (zone.dataset.answer === 'Beam Bridge') zone.textContent = 'Flat beam across supports';
+        if (zone.dataset.answer === 'Arch Bridge') zone.textContent = 'Curved arch helps spread weight';
+        if (zone.dataset.answer === 'Suspension Bridge') zone.textContent = 'Deck hangs from cables on tall towers';
+      });
+      zones.sort(() => Math.random() - 0.5);
+      zones.forEach(z => dropContainer.appendChild(z));
+    }
+  </script>
+</body>
+</html>
